@@ -12,14 +12,14 @@ logger = logging.getLogger(__name__)
 
 class InternetArchiveStorage(Storage):
 
-    def _open(name, mode='rb'):
+    def _open(self, name, mode='rb'):
         logger.debug(f"Opening {name}")
         # Get the file and open it
         # TK
         # Return it as a File object
         return File('')
 
-    def _save(name, content):
+    def _save(self, name, content):
         logger.debug(f"Saving {name}")
         # Save the content File object
         # TK
