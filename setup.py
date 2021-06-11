@@ -1,5 +1,57 @@
 import os
 from setuptools import setup
+from distutils.core import Command
+
+
+class TestCommand(Command):
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import django
+        from django.conf import settings
+        settings.configure(
+            DATABASES={
+                'default': {
+                    'NAME': ':memory:',
+                    'ENGINE': 'django.db.backends.sqlite3'
+                }
+            },
+            INSTALLED_APPS=('ia_storage',),
+            DEFAULT_AUTO_FIELD='django.db.models.BigAutoField',
+            LOGGING = {
+                'version': 1,
+                'disable_existing_loggers': False,
+                'handlers': {
+                    'file': {
+                        'level': 'DEBUG',
+                        'class': 'logging.FileHandler',
+                        'filename': os.path.join(os.path.dirname(__file__), 'tests.log'),
+                    },
+                },
+                'formatters': {
+                    'verbose': {
+                        'format': '%(levelname)s|%(asctime)s|%(module)s|%(message)s',
+                        'datefmt': "%d/%b/%Y %H:%M:%S"
+                    }
+                },
+                'loggers': {
+                    'postgres_copy': {
+                        'handlers': ['file'],
+                        'level': 'DEBUG',
+                        'propagate': True,
+                    },
+                }
+            }
+        )
+        from django.core.management import call_command
+        django.setup()
+        call_command('test', 'ia_storage')
 
 
 def read(fname):
@@ -18,6 +70,9 @@ setup(
     url='http://www.github.com/california-civic-data-coalition/django-internetarchive-storage',
     license="MIT",
     packages=("ia_storage",),
+    install_requires=[
+        'internetarchive',
+    ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python',
@@ -31,4 +86,5 @@ setup(
         'Source': 'https://github.com/datadesk/california-civic-data-coalition/django-internetarchive-storage',
         'Tracker': 'https://github.com/datadesk/<california-civic-data-coalition/django-internetarchive-storage/issues'
     },
+    cmdclass={'test': TestCommand}
 )

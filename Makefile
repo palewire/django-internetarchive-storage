@@ -2,7 +2,7 @@
 
 test:
 	pipenv run flake8 ./ia_storage
-	pipenv run coverage run example/manage.py test ia_storage
+	pipenv run coverage run setup.py test
 	pipenv run coverage report -m
 
 

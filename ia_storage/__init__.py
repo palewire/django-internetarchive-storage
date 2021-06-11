@@ -1,4 +1,5 @@
 import os
+import logging
 from urllib.parse import urljoin
 from django.core.files import File
 from django.core.files.storage import Storage
@@ -6,16 +7,20 @@ from django.utils.text import get_valid_filename
 from django.utils.crypto import get_random_string
 from django.utils.encoding import filepath_to_uri
 
+logger = logging.getLogger(__name__)
+
 
 class InternetArchiveStorage(Storage):
 
     def _open(name, mode='rb'):
+        logger.debug(f"Opening {name}")
         # Get the file and open it
         # TK
         # Return it as a File object
         return File('')
 
     def _save(name, content):
+        logger.debug(f"Saving {name}")
         # Save the content File object
         # TK
         # Return the name saved to the backend
