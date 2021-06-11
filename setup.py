@@ -8,16 +8,16 @@ def read(fname):
 
 
 setup(
-    name='<your-pypi-package-name>',
+    name='django-internetarchive-storage',
     version='0.0.1',
-    description="<your-repo-description>",
+    description="A custom Django storage system for Internet Archive collections",
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
-    author='Los Angeles Times Data and Graphics Department',
-    author_email='datagraphics@caltimes.com',
-    url='http://www.github.com/datadesk/<your-repo-slug>',
+    author='Ben Welsh',
+    author_email='b@palewi.re',
+    url='http://www.github.com/california-civic-data-coalition/django-internetarchive-storage',
     license="MIT",
-    packages=("<your-python-module-name>",),
+    packages=("ia_storage",),
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python',
@@ -27,8 +27,8 @@ setup(
         'License :: OSI Approved :: MIT License',
     ],
     project_urls={
-        'Maintainer': 'https://github.com/datadesk',
-        'Source': 'https://github.com/datadesk/<your-repo-slug>',
-        'Tracker': 'https://github.com/datadesk/<your-repo-slug>/issues'
+        'Maintainer': 'https://github.com/california-civic-data-coalition',
+        'Source': 'https://github.com/datadesk/california-civic-data-coalition/django-internetarchive-storage',
+        'Tracker': 'https://github.com/datadesk/<california-civic-data-coalition/django-internetarchive-storage/issues'
     },
 )

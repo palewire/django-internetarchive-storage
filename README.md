@@ -1,6 +1,6 @@
-# python-open-source-template
+# django-internetarchive-storage
 
-A template for open-source Python software repositories
+A custom Django storage system for Internet Archive collections
 
 ## Contributing
 
