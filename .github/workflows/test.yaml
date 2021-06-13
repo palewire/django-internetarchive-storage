@@ -61,3 +61,5 @@ jobs:
         run: make test
         env:
           PGPASSWORD: postgres
+          IA_STORAGE_ACCESS_KEY: ${{ secrets.IA_STORAGE_ACCESS_KEY }}
+          IA_STORAGE_SECRET_KEY: ${{ secrets.IA_STORAGE_SECRET_KEY }}
