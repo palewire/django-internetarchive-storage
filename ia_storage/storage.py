@@ -6,8 +6,8 @@ import urllib.request
 import internetarchive
 from urllib.parse import urljoin
 from django.conf import settings
-from django.core.files.base import File
 from django.core.files.storage import Storage
+from django.core.files.base import ContentFile, File
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +27,12 @@ class InternetArchiveStorage(Storage):
         # Parse the file out of the content input
         if isinstance(content, dict):
             filename, fileobj = list(content.items())[0]
+            files = {filename: fileobj}
+        elif isinstance(content, (File, ContentFile)):
+            filename = os.path.basename(content.name)
+            files = {filename: content.file}
+        else:
+            raise ValueError("Inputs must be File or ContentFile objects, or a file dict in the style requested by IA")
 
         name = self.get_available_name(identifier, filename, max_length=max_length)
 
@@ -62,7 +68,7 @@ class InternetArchiveStorage(Storage):
 
         # Prep the upload
         kwargs = dict(
-            files=content,
+            files=files,
             metadata=clean_metadata
         )
 
@@ -74,7 +80,7 @@ class InternetArchiveStorage(Storage):
         logger.debug("Uploading item to archive.org")
         logger.debug(f"identifier: {identifier}")
         logger.debug(f"name: {name}")
-        logger.debug(f"content: {content}")
+        logger.debug(f"content: {files}")
         logger.debug(f"metadata: {clean_metadata}")
 
         # Do the upload
