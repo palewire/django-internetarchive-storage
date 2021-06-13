@@ -47,6 +47,10 @@ class InternetArchiveStorageTests(TestCase):
         # Start checking stuff on the web
         self.assertEqual(obj.data.size, 30)
 
+        obj.data.open()
+        self.assertEqual(obj.data.read().decode("utf-8"), content)
+        obj.data.close()
+
         # Throw an error if an object is re-uploaded with the same name
         with self.assertRaises(FileExistsError):
             obj2 = TestModel.objects.create()
@@ -57,7 +61,3 @@ class InternetArchiveStorageTests(TestCase):
 
         # Delete the file
         obj.data.delete()
-
-        # obj.data.open('rb')
-        # self.assertEqual(obj.data.read(), 'A string with the file content')
-        # obj.data.close()

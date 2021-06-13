@@ -1,9 +1,12 @@
+import io
 import os
 import logging
+import requests
 import urllib.request
 import internetarchive
 from urllib.parse import urljoin
 from django.conf import settings
+from django.core.files.base import File
 from django.core.files.storage import Storage
 
 logger = logging.getLogger(__name__)
@@ -16,10 +19,9 @@ class InternetArchiveStorage(Storage):
 
     def _open(self, name, mode='rb'):
         logger.debug(f"Opening {name}")
-        # Get the file and open it
-        # TK
-        # Return it as a File object
-        return name
+        url = self.url(name)
+        r = requests.get(url)
+        return File(io.BytesIO(r.content))
 
     def save(self, identifier, content, max_length=None, metadata={}):
         # Parse the file out of the content input
