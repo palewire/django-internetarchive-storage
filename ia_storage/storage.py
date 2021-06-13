@@ -1,5 +1,6 @@
 import os
 import logging
+import urllib.request
 import internetarchive
 from urllib.parse import urljoin
 from django.conf import settings
@@ -97,6 +98,11 @@ class InternetArchiveStorage(Storage):
     def url(self, name):
         return urljoin(self.base_url, name)
 
+    def size(self, name):
+        url = self.url(name)
+        r = urllib.request.urlopen(url)
+        return r.length
+
     # Stuff below here I haven't worked out yet
 
     def get_valid_name(self, name):
@@ -142,6 +148,3 @@ class InternetArchiveStorage(Storage):
                 else:
                     files.append(entry.name)
         return directories, files
-
-    def size(self, name):
-        return os.path.getsize(self.path(name))

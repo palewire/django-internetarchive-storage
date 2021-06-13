@@ -38,7 +38,6 @@ class InternetArchiveStorageTests(TestCase):
         self.assertEqual(obj.data.name, filename)
         self.assertEqual(obj.data.url, url)
 
-        # https://archive.org/download/django-internetarchive-storage-test-upload-fppMm3taIXdt/text.txt
         # obj.data.open('rb')
         # self.assertEqual(obj.data.read(), 'A string with the file content')
         # obj.data.close()
