@@ -23,51 +23,43 @@ class InternetArchiveStorage(Storage):
         # Return it as a File object
         return name
 
-    def save(self, name, content, max_length=None):
+    def save(self, name, content, max_length=None, metadata={}):
         name = self.get_available_name(name, max_length=max_length)
-        return self._save(name, content)
-
-    def _save(self, name, content):
-        # Validate the file
-        files = content['file']
-
-        # Pull metadata from the content input
-        kwargs = content.get('metadata', {})
 
         # Set the metadata what will be uploaded
-        metadata = {}
-        if kwargs.get('collection') or getattr(settings, 'IA_STORAGE_COLLECTION', None):
-            metadata['collection'] = kwargs.get('collection') or getattr(settings, 'IA_STORAGE_COLLECTION', None)
+        clean_metadata = {}
+        if metadata.get('collection') or getattr(settings, 'IA_STORAGE_COLLECTION', None):
+            clean_metadata['collection'] = metadata.get('collection') or getattr(settings, 'IA_STORAGE_COLLECTION', None)
 
-        if kwargs.get('title') or getattr(settings, 'IA_STORAGE_TITLE', None):
-            metadata['title'] = kwargs.get('title') or getattr(settings, 'IA_STORAGE_TITLE', None)
+        if metadata.get('title') or getattr(settings, 'IA_STORAGE_TITLE', None):
+            clean_metadata['title'] = metadata.get('title') or getattr(settings, 'IA_STORAGE_TITLE', None)
 
-        if kwargs.get('mediatype') or getattr(settings, 'IA_STORAGE_MEDIATYPE', None):
-            metadata['mediatype'] = kwargs.get('mediatype') or getattr(settings, 'IA_STORAGE_MEDIATYPE', None)
+        if metadata.get('mediatype') or getattr(settings, 'IA_STORAGE_MEDIATYPE', None):
+            clean_metadata['mediatype'] = metadata.get('mediatype') or getattr(settings, 'IA_STORAGE_MEDIATYPE', None)
 
-        if kwargs.get('contributor') or getattr(settings, 'IA_STORAGE_CONTRIBUTOR', None):
-            metadata['contributor'] = kwargs.get('contributor') or getattr(settings, 'IA_STORAGE_CONTRIBUTOR', None)
+        if metadata.get('contributor') or getattr(settings, 'IA_STORAGE_CONTRIBUTOR', None):
+            clean_metadata['contributor'] = metadata.get('contributor') or getattr(settings, 'IA_STORAGE_CONTRIBUTOR', None)
 
-        if kwargs.get('creator') or getattr(settings, 'IA_STORAGE_CREATOR', None):
-            metadata['creator'] = kwargs.get('creator') or getattr(settings, 'IA_STORAGE_CREATOR', None)
+        if metadata.get('creator') or getattr(settings, 'IA_STORAGE_CREATOR', None):
+            clean_metadata['creator'] = metadata.get('creator') or getattr(settings, 'IA_STORAGE_CREATOR', None)
 
-        if kwargs.get('publisher') or getattr(settings, 'IA_STORAGE_PUBLISHER', None):
-            metadata['publisher'] = kwargs.get('publisher') or getattr(settings, 'IA_STORAGE_PUBLISHER', None)
+        if metadata.get('publisher') or getattr(settings, 'IA_STORAGE_PUBLISHER', None):
+            clean_metadata['publisher'] = metadata.get('publisher') or getattr(settings, 'IA_STORAGE_PUBLISHER', None)
 
-        if kwargs.get('date') or getattr(settings, 'IA_STORAGE_DATE', None):
-            metadata['date'] = kwargs.get('date') or getattr(settings, 'IA_STORAGE_DATE', None)
+        if metadata.get('date') or getattr(settings, 'IA_STORAGE_DATE', None):
+            clean_metadata['date'] = metadata.get('date') or getattr(settings, 'IA_STORAGE_DATE', None)
 
-        if kwargs.get('subject') or getattr(settings, 'IA_STORAGE_SUBJECT', None):
-            metadata['subject'] = kwargs.get('subject') or getattr(settings, 'IA_STORAGE_SUBJECT', None)
+        if metadata.get('subject') or getattr(settings, 'IA_STORAGE_SUBJECT', None):
+            clean_metadata['subject'] = metadata.get('subject') or getattr(settings, 'IA_STORAGE_SUBJECT', None)
 
-        if kwargs.get('extra_metadata') or getattr(settings, 'IA_STORAGE_EXTRA_METADATA', {}):
-            e = kwargs.get('extra_metadata') or getattr(settings, 'IA_STORAGE_EXTRA_METADATA', {})
-            metadata.update(**e)
+        if metadata.get('extra_metadata') or getattr(settings, 'IA_STORAGE_EXTRA_METADATA', {}):
+            e = metadata.get('extra_metadata') or getattr(settings, 'IA_STORAGE_EXTRA_METADATA', {})
+            clean_metadata.update(**e)
 
         # Prep the upload
         kwargs = dict(
-            files=files,
-            metadata=metadata
+            files=content,
+            metadata=clean_metadata
         )
 
         if self.ACCESS_KEY and self.SECRET_KEY:
@@ -78,8 +70,7 @@ class InternetArchiveStorage(Storage):
         logger.debug("Uploading item to archive.org")
         logger.debug(f"name: {name}")
         logger.debug(f"content: {content}")
-        logger.debug(f"metadata: {metadata}")
-        logger.debug(f"kwargs: {kwargs}")
+        logger.debug(f"metadata: {clean_metadata}")
 
         # Do the upload
         item = internetarchive.upload(name, **kwargs)
