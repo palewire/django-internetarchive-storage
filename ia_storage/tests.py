@@ -41,8 +41,8 @@ class InternetArchiveStorageTests(TestCase):
         self.assertEqual(obj.data.url, url)
 
         # Wait 30 seconds for the URL to show up on the web
-        print("Sleeping 60 seconds")
-        time.sleep(60)
+        print("Sleeping 120 seconds")
+        time.sleep(120)
 
         # Start checking stuff on the web
         self.assertEqual(obj.data.size, 30)
