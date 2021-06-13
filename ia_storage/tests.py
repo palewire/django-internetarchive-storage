@@ -21,7 +21,7 @@ class InternetArchiveStorageTests(TestCase):
         suffix = get_random_string()
         identifier = f'django-internetarchive-storage-test-upload-{suffix}'
         content = dict(
-            files={'text.txt': io.StringIO('A string with the file content')},
+            file={'text.txt': io.StringIO('A string with the file content')},
             metadata=dict(
                 title=f'django-internetarchive-storage: Test upload {suffix}'
             )

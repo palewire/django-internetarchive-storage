@@ -27,11 +27,10 @@ class InternetArchiveStorage(Storage):
         name = self.get_available_name(name, max_length=max_length)
         return self._save(name, content)
 
-    def _save(
-        self,
-        name,
-        content,
-    ):
+    def _save(self, name, content):
+        # Validate the file
+        files = content['file']
+
         # Pull metadata from the content input
         kwargs = content.get('metadata', {})
 
@@ -65,8 +64,9 @@ class InternetArchiveStorage(Storage):
             e = kwargs.get('extra_metadata') or getattr(settings, 'IA_STORAGE_EXTRA_METADATA', {})
             metadata.update(**e)
 
+        # Prep the upload
         kwargs = dict(
-            files=content['files'],
+            files=files,
             metadata=metadata
         )
 
@@ -74,14 +74,16 @@ class InternetArchiveStorage(Storage):
             kwargs['access_key'] = self.ACCESS_KEY
             kwargs['secret_key'] = self.SECRET_KEY
 
+        # Print some debugging stuff
         logger.debug(f"Uploading item to archive.org")
         logger.debug(f"name: {name}")
         logger.debug(f"content: {content}")
         logger.debug(f"metadata: {metadata}")
         logger.debug(f"kwargs: {kwargs}")
 
-        # Save the content File object
+        # Do the upload
         item = internetarchive.upload(name, **kwargs)
+        logger.debug(item)
 
         # Return the name saved to the backend
         return name

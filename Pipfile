@@ -12,6 +12,7 @@ coverage = "*"
 django = "*"
 psycopg2-binary = "*"
 internetarchive = "*"
+typing_extensions = "*"
 
 [requires]
 python_version = "3.9"
