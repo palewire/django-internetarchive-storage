@@ -1,8 +1,6 @@
 from ia_storage.storage import InternetArchiveStorage
 from django.db.models.fields.files import FieldFile, FileField
 
-fs = InternetArchiveStorage()
-
 
 class InternetArchiveFieldFile(FieldFile):
 
@@ -24,3 +22,12 @@ class InternetArchiveFieldFile(FieldFile):
 
 class InternetArchiveFileField(FileField):
     attr_class = InternetArchiveFieldFile
+
+    def __init__(self, verbose_name=None, name=None, upload_to='', storage=InternetArchiveStorage, **kwargs):
+        return super().__init__(
+            verbose_name=verbose_name,
+            name=name,
+            upload_to=upload_to,
+            storage=storage,
+            **kwargs
+        )
