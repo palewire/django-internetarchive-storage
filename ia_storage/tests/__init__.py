@@ -6,14 +6,11 @@ from django.test import TestCase
 from urllib.parse import urljoin
 from django.utils.crypto import get_random_string
 from django.core.files.base import File, ContentFile
-from ia_storage.storage import InternetArchiveStorage
 from ia_storage.fields import InternetArchiveFileField
-
-fs = InternetArchiveStorage()
 
 
 class TestModel(models.Model):
-    data = InternetArchiveFileField(storage=fs)
+    data = InternetArchiveFileField()
 
 
 class InternetArchiveStorageTests(TestCase):
