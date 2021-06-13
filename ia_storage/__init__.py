@@ -75,7 +75,7 @@ class InternetArchiveStorage(Storage):
             kwargs['secret_key'] = self.SECRET_KEY
 
         # Print some debugging stuff
-        logger.debug(f"Uploading item to archive.org")
+        logger.debug("Uploading item to archive.org")
         logger.debug(f"name: {name}")
         logger.debug(f"content: {content}")
         logger.debug(f"metadata: {metadata}")
@@ -84,6 +84,9 @@ class InternetArchiveStorage(Storage):
         # Do the upload
         item = internetarchive.upload(name, **kwargs)
         logger.debug(item)
+
+        # https://archive.org/details/django-internetarchive-storage-test-upload-fppMm3taIXdt
+        # https://archive.org/download/django-internetarchive-storage-test-upload-fppMm3taIXdt/text.txt
 
         # Return the name saved to the backend
         return name
