@@ -1,7 +1,9 @@
 import os
 import logging
+import internetarchive
 from urllib.parse import urljoin
-from django.core.files import File
+from django.conf import settings
+# from django.core.files import File
 from django.core.files.storage import Storage
 from django.utils.text import get_valid_filename
 from django.utils.crypto import get_random_string
@@ -11,18 +13,76 @@ logger = logging.getLogger(__name__)
 
 
 class InternetArchiveStorage(Storage):
+    ACCESS_KEY = getattr(settings, 'IA_STORAGE_ACCESS_KEY', None)
+    SECRET_KEY = getattr(settings, 'IA_STORAGE_SECRET_KEY', None)
 
     def _open(self, name, mode='rb'):
         logger.debug(f"Opening {name}")
         # Get the file and open it
         # TK
         # Return it as a File object
-        return File('')
+        return name
 
-    def _save(self, name, content):
-        logger.debug(f"Saving {name}")
+    def save(self, name, content, max_length=None):
+        name = self.get_available_name(name, max_length=max_length)
+        return self._save(name, content)
+
+    def _save(
+        self,
+        name,
+        content,
+    ):
+        # Pull metadata from the content input
+        kwargs = content.get('metadata', {})
+
+        # Set the metadata what will be uploaded
+        metadata = {}
+        if kwargs.get('collection') or getattr(settings, 'IA_STORAGE_COLLECTION', None):
+            metadata['collection'] = kwargs.get('collection') or getattr(settings, 'IA_STORAGE_COLLECTION', None)
+
+        if kwargs.get('title') or getattr(settings, 'IA_STORAGE_TITLE', None):
+            metadata['title'] = kwargs.get('title') or getattr(settings, 'IA_STORAGE_TITLE', None)
+
+        if kwargs.get('mediatype') or getattr(settings, 'IA_STORAGE_MEDIATYPE', None):
+            metadata['mediatype'] = kwargs.get('mediatype') or getattr(settings, 'IA_STORAGE_MEDIATYPE', None)
+
+        if kwargs.get('contributor') or getattr(settings, 'IA_STORAGE_CONTRIBUTOR', None):
+            metadata['contributor'] = kwargs.get('contributor') or getattr(settings, 'IA_STORAGE_CONTRIBUTOR', None)
+
+        if kwargs.get('creator') or getattr(settings, 'IA_STORAGE_CREATOR', None):
+            metadata['creator'] = kwargs.get('creator') or getattr(settings, 'IA_STORAGE_CREATOR', None)
+
+        if kwargs.get('publisher') or getattr(settings, 'IA_STORAGE_PUBLISHER', None):
+            metadata['publisher'] = kwargs.get('publisher') or getattr(settings, 'IA_STORAGE_PUBLISHER', None)
+
+        if kwargs.get('date') or getattr(settings, 'IA_STORAGE_DATE', None):
+            metadata['date'] = kwargs.get('date') or getattr(settings, 'IA_STORAGE_DATE', None)
+
+        if kwargs.get('subject') or getattr(settings, 'IA_STORAGE_SUBJECT', None):
+            metadata['subject'] = kwargs.get('subject') or getattr(settings, 'IA_STORAGE_SUBJECT', None)
+
+        if kwargs.get('extra_metadata') or getattr(settings, 'IA_STORAGE_EXTRA_METADATA', {}):
+            e = kwargs.get('extra_metadata') or getattr(settings, 'IA_STORAGE_EXTRA_METADATA', {})
+            metadata.update(**e)
+
+        kwargs = dict(
+            files=content['files'],
+            metadata=metadata
+        )
+
+        if self.ACCESS_KEY and self.SECRET_KEY:
+            kwargs['access_key'] = self.ACCESS_KEY
+            kwargs['secret_key'] = self.SECRET_KEY
+
+        logger.debug(f"Uploading item to archive.org")
+        logger.debug(f"name: {name}")
+        logger.debug(f"content: {content}")
+        logger.debug(f"metadata: {metadata}")
+        logger.debug(f"kwargs: {kwargs}")
+
         # Save the content File object
-        # TK
+        item = internetarchive.upload(name, **kwargs)
+
         # Return the name saved to the backend
         return name
 

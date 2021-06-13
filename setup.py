@@ -16,6 +16,14 @@ class TestCommand(Command):
         import django
         from django.conf import settings
         settings.configure(
+            IA_STORAGE_ACCESS_KEY=os.getenv('IA_STORAGE_ACCESS_KEY'),
+            IA_STORAGE_SECRET_KEY=os.getenv('IA_STORAGE_SECRET_KEY'),
+            IA_STORAGE_COLLECTION='test_collection',
+            IA_STORAGE_CONTRIBUTOR='palewire',
+            IA_STORAGE_CREATOR="palewire",
+            IA_STORAGE_PUBLISHER='california-civic-data-coalition/django-internetarchive-storage',
+            IA_STORAGE_MEDIATYPE="data",
+            IA_STORAGE_SUBJECT=['test'],
             DATABASES={
                 'default': {
                     'NAME': ':memory:',
@@ -33,6 +41,9 @@ class TestCommand(Command):
                         'class': 'logging.FileHandler',
                         'filename': os.path.join(os.path.dirname(__file__), 'tests.log'),
                     },
+                    'console': {
+                        'class': 'logging.StreamHandler',
+                    },
                 },
                 'formatters': {
                     'verbose': {
@@ -41,8 +52,8 @@ class TestCommand(Command):
                     }
                 },
                 'loggers': {
-                    'postgres_copy': {
-                        'handlers': ['file'],
+                    'ia_storage': {
+                        'handlers': ['console'],
                         'level': 'DEBUG',
                         'propagate': True,
                     },
