@@ -1,5 +1,6 @@
 import io
 import os
+import time
 from django.db import models
 from django.test import TestCase
 from urllib.parse import urljoin
@@ -19,24 +20,43 @@ class InternetArchiveStorageTests(TestCase):
     def setUp(self):
         pass
 
-    def test_archive(self):
+    def test_stringio(self):
         suffix = get_random_string()
         identifier = f'django-internetarchive-storage-test-upload-{suffix}'
         name = 'text.txt'
         filename = os.path.join(identifier, name)
         url = urljoin('https://archive.org/download/', filename)
+        content = 'A string with the file content'
 
+        # Upload the first object
         obj = TestModel.objects.create()
-        content = {name: io.StringIO('A string with the file content')}
         obj.data.save(
             identifier,
-            content,
+            {name: io.StringIO(content)},
             metadata=dict(
                 title=f'django-internetarchive-storage: Test upload {suffix}'
             )
         )
         self.assertEqual(obj.data.name, filename)
         self.assertEqual(obj.data.url, url)
+
+        # Wait 30 seconds for the URL to show up on the web
+        print("Sleeping 60 seconds")
+        time.sleep(60)
+
+        # Start checking stuff on the web
+        self.assertEqual(obj.data.size, 30)
+
+        # Throw an error if an object is re-uploaded with the same name
+        with self.assertRaises(FileExistsError):
+            obj2 = TestModel.objects.create()
+            obj2.data.save(
+                identifier,
+                {name: io.StringIO(content)}
+            )
+
+        # Delete the file
+        obj.data.delete()
 
         # obj.data.open('rb')
         # self.assertEqual(obj.data.read(), 'A string with the file content')

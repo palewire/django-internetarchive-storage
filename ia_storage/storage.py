@@ -4,10 +4,7 @@ import urllib.request
 import internetarchive
 from urllib.parse import urljoin
 from django.conf import settings
-# from django.core.files import File
 from django.core.files.storage import Storage
-from django.utils.text import get_valid_filename
-from django.utils.crypto import get_random_string
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +68,7 @@ class InternetArchiveStorage(Storage):
             kwargs['access_key'] = self.ACCESS_KEY
             kwargs['secret_key'] = self.SECRET_KEY
 
-        # Print some debugging stuff
+        # Log some debugging stuff
         logger.debug("Uploading item to archive.org")
         logger.debug(f"identifier: {identifier}")
         logger.debug(f"name: {name}")
@@ -93,6 +90,10 @@ class InternetArchiveStorage(Storage):
         # Merge the identifier and filename together
         path = os.path.join(identifier, filename)
         # Figure out if the name already exists on Internet Archive
+        exists = self.exists(identifier, filename)
+        if exists:
+            raise FileExistsError(f'File name of {filename} already exists in identifier {identifier}')
+        # Assuming we are okay, return the path
         return path
 
     def url(self, name):
@@ -103,48 +104,17 @@ class InternetArchiveStorage(Storage):
         r = urllib.request.urlopen(url)
         return r.length
 
-    # Stuff below here I haven't worked out yet
+    def exists(self, identifier, filename):
+        # Query the file list from the API
+        logger.debug(f"Seeing if {identifier}/{filename} exists")
+        results = list(internetarchive.get_files(identifier, filename))
+        logger.debug(f"results: {results}")
+        return len(results) > 0
 
-    def get_valid_name(self, name):
-        """
-        Return a filename, based on the provided filename, that's suitable for
-        use in the target storage system.
-        """
-        return get_valid_filename(name)
-
-    def get_alternative_name(self, file_root, file_ext):
-        """
-        Return an alternative filename, by adding an underscore and a random 7
-        character alphanumeric string (before the file extension, if one
-        exists) to the filename.
-        """
-        return '%s_%s%s' % (file_root, get_random_string(7), file_ext)
-
-    def delete(self, name):
-        if not name:
-            raise ValueError('The name must be given to delete().')
-        name = self.path(name)
-        # If the file or directory exists, delete it from the filesystem.
-        try:
-            if os.path.isdir(name):
-                os.rmdir(name)
-            else:
-                os.remove(name)
-        except FileNotFoundError:
-            # FileNotFoundError is raised if the file or directory was removed
-            # concurrently.
-            pass
-
-    def exists(self, name):
-        return os.path.lexists(self.path(name))
-
-    def listdir(self, path):
-        path = self.path(path)
-        directories, files = [], []
-        with os.scandir(path) as entries:
-            for entry in entries:
-                if entry.is_dir():
-                    directories.append(entry.name)
-                else:
-                    files.append(entry.name)
-        return directories, files
+    def delete(self, identifier, filename):
+        kwargs = {}
+        if self.ACCESS_KEY and self.SECRET_KEY:
+            kwargs['access_key'] = self.ACCESS_KEY
+            kwargs['secret_key'] = self.SECRET_KEY
+        logger.debug(f"Deleting {identifier}/{filename}")
+        internetarchive.delete(identifier, filename, **kwargs)

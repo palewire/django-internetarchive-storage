@@ -19,6 +19,20 @@ class InternetArchiveFieldFile(FieldFile):
         if save:
             self.instance.save()
 
+    def delete(self, save=True):
+        if not self:
+            return
+
+        identifier, filename = self.name.split("/")
+        self.storage.delete(identifier, filename)
+
+        self.name = None
+        setattr(self.instance, self.field.attname, self.name)
+        self._committed = False
+
+        if save:
+            self.instance.save()
+
 
 class InternetArchiveFileField(FileField):
     attr_class = InternetArchiveFieldFile
