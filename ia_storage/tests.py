@@ -1,29 +1,11 @@
 import io
 from django.db import models
 from django.test import TestCase
-from ia_storage import InternetArchiveStorage
-from django.db.models.fields.files import FieldFile, FileField
-# from django.core.files.base import ContentFile
 from django.utils.crypto import get_random_string
+from ia_storage.storage import InternetArchiveStorage
+from ia_storage.fields import InternetArchiveFileField
 
 fs = InternetArchiveStorage()
-
-
-class InternetArchiveFieldFile(FieldFile):
-
-    def save(self, name, content, save=True, metadata={}):
-        name = self.field.generate_filename(self.instance, name)
-        self.name = self.storage.save(name, content, max_length=self.field.max_length, metadata=metadata)
-        setattr(self.instance, self.field.attname, self.name)
-        self._committed = True
-
-        # Save the object because it has changed, unless save is False
-        if save:
-            self.instance.save()
-
-
-class InternetArchiveFileField(FileField):
-    attr_class = InternetArchiveFieldFile
 
 
 class TestModel(models.Model):
