@@ -2,6 +2,8 @@
 
 A custom Django storage system for Internet Archive collections
 
+[![Test](https://github.com/california-civic-data-coalition/django-internetarchive-storage/actions/workflows/test.yaml/badge.svg)](https://github.com/california-civic-data-coalition/django-internetarchive-storage/actions/workflows/test.yaml)
+
 ## Installation
 
 Install the package from PyPI.
