@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.files.storage import Storage
 from django.utils.text import get_valid_filename
 from django.utils.crypto import get_random_string
-from django.utils.encoding import filepath_to_uri
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +14,7 @@ logger = logging.getLogger(__name__)
 class InternetArchiveStorage(Storage):
     ACCESS_KEY = getattr(settings, 'IA_STORAGE_ACCESS_KEY', None)
     SECRET_KEY = getattr(settings, 'IA_STORAGE_SECRET_KEY', None)
+    base_url = 'https://archive.org/download/'
 
     def _open(self, name, mode='rb'):
         logger.debug(f"Opening {name}")
@@ -23,8 +23,12 @@ class InternetArchiveStorage(Storage):
         # Return it as a File object
         return name
 
-    def save(self, name, content, max_length=None, metadata={}):
-        name = self.get_available_name(name, max_length=max_length)
+    def save(self, identifier, content, max_length=None, metadata={}):
+        # Parse the file out of the content input
+        if isinstance(content, dict):
+            filename, fileobj = list(content.items())[0]
+
+        name = self.get_available_name(identifier, filename, max_length=max_length)
 
         # Set the metadata what will be uploaded
         clean_metadata = {}
@@ -68,19 +72,32 @@ class InternetArchiveStorage(Storage):
 
         # Print some debugging stuff
         logger.debug("Uploading item to archive.org")
+        logger.debug(f"identifier: {identifier}")
         logger.debug(f"name: {name}")
         logger.debug(f"content: {content}")
         logger.debug(f"metadata: {clean_metadata}")
 
         # Do the upload
-        item = internetarchive.upload(name, **kwargs)
+        item = internetarchive.upload(identifier, **kwargs)
         logger.debug(item)
-
-        # https://archive.org/details/django-internetarchive-storage-test-upload-fppMm3taIXdt
-        # https://archive.org/download/django-internetarchive-storage-test-upload-fppMm3taIXdt/text.txt
 
         # Return the name saved to the backend
         return name
+
+    def get_available_name(self, identifier, filename, max_length=None):
+        """
+        Return a filename that's free on the target storage system and
+        available for new content to be written to.
+        """
+        # Merge the identifier and filename together
+        path = os.path.join(identifier, filename)
+        # Figure out if the name already exists on Internet Archive
+        return path
+
+    def url(self, name):
+        return urljoin(self.base_url, name)
+
+    # Stuff below here I haven't worked out yet
 
     def get_valid_name(self, name):
         """
@@ -96,14 +113,6 @@ class InternetArchiveStorage(Storage):
         exists) to the filename.
         """
         return '%s_%s%s' % (file_root, get_random_string(7), file_ext)
-
-    def get_available_name(self, name, max_length=None):
-        """
-        Return a filename that's free on the target storage system and
-        available for new content to be written to.
-        """
-        # Figure out if the name already exists on Internet Archive
-        return name
 
     def delete(self, name):
         if not name:
@@ -136,11 +145,3 @@ class InternetArchiveStorage(Storage):
 
     def size(self, name):
         return os.path.getsize(self.path(name))
-
-    def url(self, name):
-        if self.base_url is None:
-            raise ValueError("This file is not accessible via a URL.")
-        url = filepath_to_uri(name)
-        if url is not None:
-            url = url.lstrip('/')
-        return urljoin(self.base_url, url)
