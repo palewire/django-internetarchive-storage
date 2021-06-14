@@ -84,7 +84,7 @@ with open('path/to/my/file.txt', 'r') as f:
     )
 ```
 
-It can also be done with Django's in-memory ContentFile object.
+It can also be done with Django's in-memory ContentFile object. You should include the name keyword so that the Internet Archive knows what to call your file inside the item.
 
 ```python
 from django.core.files.base import ContentFile
@@ -92,7 +92,7 @@ from django.core.files.base import ContentFile
 obj = Memento.objects.create(name='palewi.re', url='https://palewi.re')
 obj.data.save(
     'my-unique-identifier',
-    ContentFile(b'This is only a test'),
+    ContentFile(b'This is only a test', name='file.txt'),
     metadata=dict(
         title='My file title',  # <-- Here we assume some of the other options are already handled in settings.py
         mediatype='data'
