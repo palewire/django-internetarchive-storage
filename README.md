@@ -62,7 +62,7 @@ A metadata keyword argument accepts the extra information that will be attached 
 * subject
 * extra_metadata
 
-In cases where you configure a metadata when you save a file, it will override any of the global configurations in settings.py.
+In cases where you provide metadata input, the system will override any of the global configurations in settings.py.
 
 Saving an object can be done with Django's File object.
 
