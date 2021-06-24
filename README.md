@@ -48,7 +48,7 @@ require that you submit two arguments to the field's save method.
 
 The first is the unique identifier where the file will be stored as an "item" on archive.org.
 
-The second is the file object containing the data you'd like to save. The file object must include have a name attribute included. It will be bundled as a "file" in the archive.org system that is attached to the parent item.
+The second is the file object containing the data you'd like to save. The file object must have a name attribute. It will be bundled as a "file" in the archive.org system that is attached to the parent item.
 
 A metadata keyword argument accepts the extra information that will be attached to the identifier. Here's the complete list that are supported.
 
