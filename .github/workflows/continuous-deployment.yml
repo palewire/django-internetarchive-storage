@@ -68,7 +68,8 @@ jobs:
       - id: run
         name: Run
         run: pipenv run python setup.py test
-        with:
+        shell: bash
+        env:
             IA_STORAGE_ACCESS_KEY: ${{ secrets.IA_STORAGE_ACCESS_KEY }}
             IA_STORAGE_SECRET_KEY: ${{ secrets.IA_STORAGE_SECRET_KEY }}
 
