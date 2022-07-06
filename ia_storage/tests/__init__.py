@@ -20,7 +20,7 @@ class InternetArchiveStorageTests(TestCase):
         self.this_dir = os.path.dirname(__file__)
 
     def test_stringio(self):
-        suffix = get_random_string()
+        suffix = get_random_string(12)
         identifier = f"django-internetarchive-storage-test-upload-{suffix}"
         name = "text.txt"
         filename = os.path.join(identifier, name)
@@ -59,7 +59,7 @@ class InternetArchiveStorageTests(TestCase):
         obj.data.delete()
 
     def test_file(self):
-        suffix = get_random_string()
+        suffix = get_random_string(12)
         identifier = f"django-internetarchive-storage-test-upload-{suffix}"
         name = "text.txt"
         filename = os.path.join(identifier, name)
@@ -91,7 +91,7 @@ class InternetArchiveStorageTests(TestCase):
         obj.data.close()
 
     def test_contentfile(self):
-        suffix = get_random_string()
+        suffix = get_random_string(12)
         identifier = f"django-internetarchive-storage-test-upload-{suffix}"
         name = "text.txt"
         filename = os.path.join(identifier, name)
