@@ -6,13 +6,16 @@ verify_ssl = true
 [dev-packages]
 twine = "*"
 flake8 = "*"
-coverage = "*"
+setuptools-scm = "*"
+pre-commit = "*"
+sphinx = "*"
+sphinx-autobuild = "*"
+myst-parser = "*"
+Django = "*"
+psycopg2-binary = "*"
 
 [packages]
-django = "*"
-psycopg2-binary = "*"
 internetarchive = "*"
-typing_extensions = "*"
 requests = "*"
 
 [requires]
