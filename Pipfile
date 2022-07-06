@@ -16,7 +16,6 @@ psycopg2-binary = "*"
 
 [packages]
 internetarchive = "*"
-requests = "*"
 
 [requires]
 python_version = "3.9"
