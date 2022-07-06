@@ -11,19 +11,19 @@ pip install django-internetarchive-storage
 Configure the minimum options in your `settings.py` file.
 
 ```python
-IA_STORAGE_ACCESS_KEY = '<your access key>'
-IA_STORAGE_SECRET_KEY = '<your secret key>'
+IA_STORAGE_ACCESS_KEY = "<your access key>"
+IA_STORAGE_SECRET_KEY = "<your secret key>"
 ```
 
 Set the other optional metadata settings that you'd like. The ones you add will be set as the default to items you upload.
 
 ```python
-IA_STORAGE_COLLECTION = ''
-IA_STORAGE_TITLE = ''
-IA_STORAGE_CONTRIBUTOR = ''
-IA_STORAGE_CREATOR = ''
-IA_STORAGE_PUBLISHER = ''
-IA_STORAGE_MEDIATYPE = ''
+IA_STORAGE_COLLECTION = ""
+IA_STORAGE_TITLE = ""
+IA_STORAGE_CONTRIBUTOR = ""
+IA_STORAGE_CREATOR = ""
+IA_STORAGE_PUBLISHER = ""
+IA_STORAGE_MEDIATYPE = ""
 IA_STORAGE_DATE = None
 IA_STORAGE_SUBJECT = []
 IA_STORAGE_EXTRA_METADATA = {}
@@ -34,6 +34,7 @@ Import this library's custom `FileField` to your model's file and add it to a da
 ```python
 from django.db import models
 from ia_storage.fields import InternetArchiveFileField
+
 
 class Memento(models.Model):
     name = models.CharField(max_length=255)
@@ -67,18 +68,18 @@ Saving an object can be done with Django's File object.
 ```python
 from django.core.files.base import File
 
-obj = Memento.objects.create(name='palewi.re', url='https://palewi.re')
-with open('path/to/my/file.txt', 'r') as f:
+obj = Memento.objects.create(name="palewi.re", url="https://palewi.re")
+with open("path/to/my/file.txt", "r") as f:
     obj.data.save(
-        'my-unique-identifier',
+        "my-unique-identifier",
         File(f),
         metadata=dict(
-            title='My file title',
-            collection='test_collection',
-            mediatype='data'
-            publisher='My name'
-            creator='palewi.re'
-        )
+            title="My file title",
+            collection="test_collection",
+            mediatype="data",
+            publisher="My name",
+            creator="palewi.re",
+        ),
     )
 ```
 
@@ -87,14 +88,14 @@ It can also be done with Django's in-memory ContentFile object. You should inclu
 ```python
 from django.core.files.base import ContentFile
 
-obj = Memento.objects.create(name='palewi.re', url='https://palewi.re')
+obj = Memento.objects.create(name="palewi.re", url="https://palewi.re")
 obj.data.save(
-    'my-unique-identifier',
-    ContentFile(b'This is only a test', name='file.txt'),
+    "my-unique-identifier",
+    ContentFile(b"This is only a test", name="file.txt"),
     metadata=dict(
-        title='My file title',  # <-- Here we assume some of the other options are already handled in settings.py
-        mediatype='data'
-    )
+        title="My file title",  # <-- Here we assume some of the other options are already handled in settings.py
+        mediatype="data",
+    ),
 )
 ```
 

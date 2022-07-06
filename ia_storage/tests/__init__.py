@@ -1,11 +1,13 @@
 import io
 import os
 import time
+from urllib.parse import urljoin
+
+from django.core.files.base import ContentFile, File
 from django.db import models
 from django.test import TestCase
-from urllib.parse import urljoin
 from django.utils.crypto import get_random_string
-from django.core.files.base import File, ContentFile
+
 from ia_storage.fields import InternetArchiveFileField
 
 
@@ -14,17 +16,16 @@ class TestModel(models.Model):
 
 
 class InternetArchiveStorageTests(TestCase):
-
     def setUp(self):
         self.this_dir = os.path.dirname(__file__)
 
     def test_stringio(self):
         suffix = get_random_string()
-        identifier = f'django-internetarchive-storage-test-upload-{suffix}'
-        name = 'text.txt'
+        identifier = f"django-internetarchive-storage-test-upload-{suffix}"
+        name = "text.txt"
         filename = os.path.join(identifier, name)
-        url = urljoin('https://archive.org/download/', filename)
-        content = 'A string with the file content'
+        url = urljoin("https://archive.org/download/", filename)
+        content = "A string with the file content"
 
         # Upload the first object
         obj = TestModel.objects.create()
@@ -32,8 +33,8 @@ class InternetArchiveStorageTests(TestCase):
             identifier,
             {name: io.StringIO(content)},
             metadata=dict(
-                title=f'django-internetarchive-storage: Test upload {suffix}'
-            )
+                title=f"django-internetarchive-storage: Test upload {suffix}"
+            ),
         )
         self.assertEqual(obj.data.name, filename)
         self.assertEqual(obj.data.url, url)
@@ -52,31 +53,28 @@ class InternetArchiveStorageTests(TestCase):
         # Throw an error if an object is re-uploaded with the same name
         with self.assertRaises(FileExistsError):
             obj2 = TestModel.objects.create()
-            obj2.data.save(
-                identifier,
-                {name: io.StringIO(content)}
-            )
+            obj2.data.save(identifier, {name: io.StringIO(content)})
 
         # Delete the file
         obj.data.delete()
 
     def test_file(self):
         suffix = get_random_string()
-        identifier = f'django-internetarchive-storage-test-upload-{suffix}'
-        name = 'text.txt'
+        identifier = f"django-internetarchive-storage-test-upload-{suffix}"
+        name = "text.txt"
         filename = os.path.join(identifier, name)
-        url = urljoin('https://archive.org/download/', filename)
-        content = b'A string with the file content'
+        url = urljoin("https://archive.org/download/", filename)
+        content = b"A string with the file content"
 
         # Upload the first object
         obj = TestModel.objects.create()
-        with open(os.path.join(self.this_dir, 'text.txt'), 'r') as f:
+        with open(os.path.join(self.this_dir, "text.txt")) as f:
             obj.data.save(
                 identifier,
                 File(f),
                 metadata=dict(
-                    title=f'django-internetarchive-storage: Test upload {suffix}'
-                )
+                    title=f"django-internetarchive-storage: Test upload {suffix}"
+                ),
             )
         self.assertEqual(obj.data.name, filename)
         self.assertEqual(obj.data.url, url)
@@ -94,11 +92,11 @@ class InternetArchiveStorageTests(TestCase):
 
     def test_contentfile(self):
         suffix = get_random_string()
-        identifier = f'django-internetarchive-storage-test-upload-{suffix}'
-        name = 'text.txt'
+        identifier = f"django-internetarchive-storage-test-upload-{suffix}"
+        name = "text.txt"
         filename = os.path.join(identifier, name)
-        url = urljoin('https://archive.org/download/', filename)
-        content = b'A string with the file content'
+        url = urljoin("https://archive.org/download/", filename)
+        content = b"A string with the file content"
 
         # Upload the first object
         obj = TestModel.objects.create()
@@ -106,8 +104,8 @@ class InternetArchiveStorageTests(TestCase):
             identifier,
             ContentFile(content, name=name),
             metadata=dict(
-                title=f'django-internetarchive-storage: Test upload {suffix}'
-            )
+                title=f"django-internetarchive-storage: Test upload {suffix}"
+            ),
         )
         self.assertEqual(obj.data.name, filename)
         self.assertEqual(obj.data.url, url)
