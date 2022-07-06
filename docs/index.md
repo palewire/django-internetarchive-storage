@@ -18,6 +18,8 @@ Install the package from PyPI.
 pipenv install django-internetarchive-storage
 ```
 
+## Getting started
+
 Configure the minimum options in your `settings.py` file.
 
 ```python
