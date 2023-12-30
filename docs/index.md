@@ -1,14 +1,6 @@
-```{include} _templates/nav.html
-```
-
 # django-internetarchive-storage
 
 A custom Django storage system for Internet Archive collections
-
-```{contents} Sections
-:local:
-:depth: 1
-```
 
 ## Installation
 
